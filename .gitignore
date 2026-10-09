@@ -1,2 +1,4 @@
 # configurações locais do editor/pré-visualização
 .claude/
+# proposta comercial e roteiro de venda (têm valores, não podem ir para o GitHub Pages)
+proposta/
