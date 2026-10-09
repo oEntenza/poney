@@ -1028,10 +1028,18 @@ a:hover > .logo .logo-cavalo,
   padding: 22px 0 30px; border-top: 1px solid rgba(255, 255, 255, 0.1); font-size: 0.9rem;
 }
 .rodape-base p { margin: 0; }
+.credito { display: inline-flex; align-items: center; gap: 12px; }
+.logo-jota5 { height: 26px; width: auto; color: #fff; overflow: visible; transition: transform 0.4s var(--ease); }
+.logo-jota5 .j5-cor { opacity: 0; transition: opacity 0.45s; } /* o 5 ganha a cor da JOTA5 no hover */
+.credito:hover .logo-jota5 { transform: translateY(-2px); }
+.credito:hover .j5-cor { opacity: 1; }
 .rodape-sociais { display: flex; gap: 10px; }
 .rodape-sociais a { display: grid; place-items: center; width: 42px; height: 42px; border-radius: 50%; background: rgba(255, 255, 255, 0.08); color: #fff; transition: background-color 0.3s, color 0.3s; }
 .rodape-sociais a:hover { background: var(--lima-200); color: var(--verde-900); }
-@media (max-width: 800px) { .rodape-grade { grid-template-columns: 1fr; gap: 30px; } }
+@media (max-width: 800px) {
+  .rodape-grade { grid-template-columns: 1fr; gap: 30px; }
+  .rodape-base { padding-bottom: 96px; } /* espaço para o botão flutuante do WhatsApp */
+}
 
 /* ---------- WhatsApp flutuante ---------- */
 .whats-flutuante {
