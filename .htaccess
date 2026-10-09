@@ -1,0 +1,9 @@
+# Endereços do site antigo (WordPress) apontando para as novas seções
+RedirectMatch 301 ^/home/?$ /
+RedirectMatch 301 ^/quem-somos/?$ /#quem-somos
+RedirectMatch 301 ^/nossa-frota(/.*)?$ /#frota
+RedirectMatch 301 ^/microonibus/?$ /#frota
+RedirectMatch 301 ^/servicos(/.*)?$ /#servicos
+RedirectMatch 301 ^/orcamento/?$ /#orcamento
+RedirectMatch 301 ^/contato/?$ /#contato
+RedirectMatch 301 ^/lista-de-passageiros/?$ /lista-de-passageiros.html
