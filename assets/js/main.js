@@ -305,9 +305,65 @@
     onibusHero.addEventListener('animationend', (e) => { if (e.animationName === 'pulinho') onibusHero.classList.remove('buzinou'); });
   }
 
-  /* ---------- letreiro: duplica o conteúdo para o loop ---------- */
+  /* ---------- letreiro: cada item anda sozinho num anel ---------- */
+  // Antes era uma faixa única (conteúdo duplicado) com milhares de pixels de largura; no celular,
+  // enquanto a página rolava, o aparelho às vezes não terminava de desenhá-la e ela aparecia vazia.
+  // Agora cada palavra/cavalo é uma camada pequena que percorre o mesmo "anel" na mesma velocidade.
   const trilhoLetreiro = $('.letreiro-trilho');
-  if (trilhoLetreiro) trilhoLetreiro.innerHTML += trilhoLetreiro.innerHTML;
+  if (trilhoLetreiro) {
+    const originais = Array.from(trilhoLetreiro.children);
+    const SEGUNDOS_POR_CONJUNTO = 38;
+
+    const montarLetreiro = () => {
+      // volta ao layout normal para medir as larguras reais
+      trilhoLetreiro.classList.remove('letreiro-anel');
+      trilhoLetreiro.style.height = '';
+      trilhoLetreiro.replaceChildren(...originais);
+      originais.forEach((el) => { el.removeAttribute('style'); });
+
+      // a faixa é inclinada e ampliada; mede com ela reta para pegar o tamanho real dos itens
+      const faixa = trilhoLetreiro.parentElement;
+      faixa.style.transform = 'none';
+      const espaco = parseFloat(getComputedStyle(trilhoLetreiro).columnGap) || 0;
+      const larguras = originais.map((el) => el.getBoundingClientRect().width);
+      const altura = Math.max(...originais.map((el) => el.getBoundingClientRect().height));
+      faixa.style.transform = '';
+      const conjunto = larguras.reduce((soma, w) => soma + w + espaco, 0);
+      // o anel precisa ser maior que a tela + o maior item, senão aparece buraco
+      const copias = Math.max(1, Math.ceil((trilhoLetreiro.parentElement.clientWidth + Math.max(...larguras)) / conjunto));
+      const anel = conjunto * copias;
+      const duracao = SEGUNDOS_POR_CONJUNTO * copias;
+
+      const itens = [];
+      const ws = [];
+      for (let c = 0; c < copias; c++) {
+        originais.forEach((el, i) => { itens.push(c === 0 ? el : el.cloneNode(true)); ws.push(larguras[i]); });
+      }
+      trilhoLetreiro.replaceChildren(...itens);
+      let pos = 0;
+      itens.forEach((el, i) => {
+        const w = ws[i];
+        // cada item vai de (anel - w) até -w; o atraso negativo faz ele começar na posição "pos"
+        el.style.setProperty('--de', (anel - w).toFixed(1) + 'px');
+        el.style.setProperty('--ate', (-w).toFixed(1) + 'px');
+        el.style.setProperty('--x0', pos.toFixed(1) + 'px');
+        el.style.animationDuration = duracao + 's';
+        el.style.animationDelay = (-duracao * (anel - w - pos) / anel).toFixed(3) + 's';
+        pos += w + espaco;
+      });
+      trilhoLetreiro.style.height = altura + 'px';
+      trilhoLetreiro.classList.add('letreiro-anel');
+    };
+
+    montarLetreiro();
+    if (doc.fonts && doc.fonts.ready) doc.fonts.ready.then(montarLetreiro); // larguras mudam quando a fonte carrega
+    let larguraJanela = window.innerWidth;
+    window.addEventListener('resize', () => {
+      if (window.innerWidth === larguraJanela) return; // no celular, a barra do navegador muda só a altura
+      larguraJanela = window.innerWidth;
+      montarLetreiro();
+    });
+  }
 
   /* ---------- cartões com inclinação 3D ---------- */
   if (ponteiroFino && !reduzir) {

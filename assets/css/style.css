@@ -543,14 +543,23 @@ a:hover > .logo .logo-cavalo,
   padding: 22px 0; transform: rotate(-1.5deg) scale(1.02); margin: 10px 0;
   border-block: 2px solid var(--verde-800);
 }
-.letreiro-trilho {
-  display: flex; align-items: center; gap: 34px; width: max-content;
-  animation: letreiro 38s linear infinite;
-}
-.letreiro:hover .letreiro-trilho { animation-play-state: paused; }
+.letreiro-trilho { display: flex; align-items: center; gap: 34px; width: max-content; } /* sem JS: faixa parada */
 .letreiro span { font-size: clamp(1.4rem, 3vw, 2.3rem); font-weight: 900; font-style: italic; text-transform: uppercase; letter-spacing: -0.01em; white-space: nowrap; }
 .letreiro-cavalo { width: 40px; height: 42px; fill: var(--verde-700); flex: none; }
-@keyframes letreiro { to { transform: translateX(-50%); } }
+/* Com JS, cada item anda sozinho num "anel" (o main.js mede as larguras e define --de, --ate e o atraso).
+   Camadas pequenas o celular desenha inteiras; uma faixa única de milhares de pixels às vezes aparecia vazia. */
+.letreiro-trilho.letreiro-anel { position: relative; width: 100%; }
+.letreiro-anel > * {
+  position: absolute; left: 0; top: 50%;
+  transform: translate3d(var(--x0, 0px), -50%, 0);
+  animation: letreiro-item linear infinite;
+  will-change: transform;
+}
+.letreiro:hover .letreiro-anel > * { animation-play-state: paused; }
+@keyframes letreiro-item {
+  from { transform: translate3d(var(--de), -50%, 0); }
+  to { transform: translate3d(var(--ate), -50%, 0); }
+}
 
 /* ---------- quem somos ---------- */
 .quem-somos-grade { display: grid; grid-template-columns: 1.05fr 1fr; gap: clamp(40px, 7vw, 96px); align-items: center; }
@@ -1071,7 +1080,7 @@ a:hover > .logo .logo-cavalo,
   html { scroll-behavior: auto; }
   *, *::before, *::after { animation-duration: 0.001ms !important; animation-iteration-count: 1 !important; transition-duration: 0.001ms !important; }
   .js [data-revelar] { opacity: 1; transform: none; }
-  .camada, .pista-faixa, .letreiro-trilho { animation: none !important; }
+  .camada, .pista-faixa, .letreiro-anel > * { animation: none !important; }
 }
 
 /* ---------- seletor de data (rodas estilo iPhone) ---------- */
